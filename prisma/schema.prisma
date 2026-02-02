@@ -36,15 +36,15 @@ model User {
 }
 
 model Hotels {
-  id String @id
-  owner_id String 
+  id String @id @default(uuid())
+  owner_id String
   name String 
   description String
   city String
   country String 
-  amenities Json @default("[]")
-  rating Decimal @db.Decimal(2,1) @default(0.0)
-  total_reviews Int @default(0)
+  amenities Json? @default("[]")
+  rating Decimal? @db.Decimal(2,1) @default(0.0)
+  total_reviews Int? @default(0)
   createdAt DateTime @default(now())
   user User @relation(fields: [owner_id], references: [id])
   rooms Rooms[]

@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Hotels" ALTER COLUMN "amenities" DROP NOT NULL,
+ALTER COLUMN "rating" DROP NOT NULL,
+ALTER COLUMN "total_reviews" DROP NOT NULL;
