@@ -56,7 +56,7 @@ export const loginController = async (req:Request, res:Response)=>{
         const data:loginSchemaType = loginSchema.parse(req.body)
         const user = await loginUser(data)
         
-        const token = await signJWT({userId: user.id})
+        const token = await signJWT({userId: user.id, role: user.role})
         res.status(200).json({
             success: true,
             data: {
