@@ -40,3 +40,9 @@ export const createHotelController = async (req:Request, res:Response)=>{
     }
 
 }   
+
+
+export const getAllHotels = (req: Request, res: Response)=>{
+    
+}
+
