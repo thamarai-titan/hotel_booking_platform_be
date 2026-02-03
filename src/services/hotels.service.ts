@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { prisma } from "../db/prisma";
 import type { HotelSchemaType } from "../schemas/hotels.schema";
 
@@ -27,4 +28,16 @@ export const createHotel = async (body: HotelSchemaType, userId: string)=>{
         throw error
     }
 
+}
+
+
+export const getAllHotels = async (where: Prisma.HotelsWhereInput)=>{
+    try {
+        const hotels = await prisma.hotels.findMany({
+            where
+        })
+        return hotels
+    } catch (error) {
+        throw error
+    }
 }

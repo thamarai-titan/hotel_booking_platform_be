@@ -32,3 +32,30 @@ export const createRoomForHotels = async (
     throw error;
   }
 };
+
+
+export const getHotelswithPriceFilter = async (minPrice: number, maxPrice: number )=>{
+  
+  const hasMin = typeof minPrice === 'number' && !Number.isNaN(minPrice)
+  const hasMax = typeof maxPrice === 'number' && !Number.isNaN(maxPrice)
+
+  const hotelIds = await prisma.rooms.groupBy({
+    by: ['hotel_id'],
+    _min: {
+      price_per_night: true
+    },
+    ...(hasMin || hasMax ? {
+        having: {
+      price_per_night: {
+        _min: {
+          gte: minPrice,
+          lte: maxPrice,
+        },
+      },
+    },
+    } : {})
+    
+  })
+  console.log(hotelIds)
+  return hotelIds
+}
