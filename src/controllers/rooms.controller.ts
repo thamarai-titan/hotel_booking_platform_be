@@ -1,7 +1,8 @@
 import type { Request, Response  } from "express"
 import { roomsSchema, type roomsSchemaType } from "../schemas/rooms.schema"
 import { createRoomForHotels } from "../services/rooms.service"
-type Params = {
+
+export type Params = {
     hotelId: string
 }
 export const addRoomtoHotels = async (req:Request<Params>, res:Response)=>{
