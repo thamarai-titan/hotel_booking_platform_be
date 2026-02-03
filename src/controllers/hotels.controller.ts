@@ -3,8 +3,7 @@ import { HotelSchema, type HotelSchemaType } from "../schemas/hotels.schema"
 import { createHotel, getAllHotels, getSingleHotelInformation } from "../services/hotels.service"
 import { getHotelswithPriceFilter, getRoomsWithHotelId } from "../services/rooms.service"
 import type { Prisma } from "@prisma/client"
-import { string, success } from "zod"
-import { id } from "zod/locales"
+
 
 interface QueryParams {
     city?: string,
