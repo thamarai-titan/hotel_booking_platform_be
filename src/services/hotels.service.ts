@@ -32,12 +32,29 @@ export const createHotel = async (body: HotelSchemaType, userId: string)=>{
 
 
 export const getAllHotels = async (where: Prisma.HotelsWhereInput)=>{
+    console.log(where)
+    
     try {
         const hotels = await prisma.hotels.findMany({
             where
         })
+        console.log(hotels)
         return hotels
     } catch (error) {
         throw error
     }
 }
+
+export const getSingleHotelInformation = async (hotelId: string)=>{
+    try {
+        const hotelDetails = await prisma.hotels.findUnique({
+            where: {
+                id: hotelId
+            }
+        })
+
+        return hotelDetails
+    } catch (error) {
+        throw error
+    }
+} 

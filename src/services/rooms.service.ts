@@ -59,3 +59,18 @@ export const getHotelswithPriceFilter = async (minPrice: number, maxPrice: numbe
   console.log(hotelIds)
   return hotelIds
 }
+
+
+export const getRoomsWithHotelId = async (hotelId: string)=>{
+  try {
+    const rooms = await prisma.rooms.findMany({
+      where: {
+        hotel_id: hotelId
+      }
+    })
+
+    return rooms
+  } catch (error) {
+    throw error
+  }
+}
