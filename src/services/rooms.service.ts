@@ -56,7 +56,6 @@ export const getHotelswithPriceFilter = async (minPrice: number, maxPrice: numbe
     } : {})
     
   })
-  console.log(hotelIds)
   return hotelIds
 }
 
