@@ -65,7 +65,7 @@ model Rooms {
 } 
 
 model Bookings {
-  id String @id
+  id String @id @default(uuid())
   user_id String
   room_id String
   hotel_id String
@@ -75,7 +75,7 @@ model Bookings {
   total_price Decimal @db.Decimal(10,2)
   status Status @default(confirmed)
   booking_date DateTime @default(now())
-  cancelled_date DateTime 
+  cancelled_date DateTime? 
   user User @relation(fields: [user_id], references: [id])
   rooms Rooms @relation(fields: [room_id], references: [id])
   hotels Hotels @relation(fields: [hotel_id], references: [id])
