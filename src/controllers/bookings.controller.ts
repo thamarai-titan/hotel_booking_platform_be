@@ -7,15 +7,19 @@ import {
   createBookings,
   getAllBookingsFromCurrentUser,
   getHotelDetailsWithroomId,
+  modifyBooking,
 } from "../services/bookings.service";
 import type { Prisma } from "@prisma/client";
 import { da } from "zod/locales";
-
+import { success } from "zod";
 
 type Params = {
   status: string;
-}
+};
 
+type BookingIdParams = {
+  bookingId: string;
+};
 export const createBookingsController = async (req: Request, res: Response) => {
   try {
     const data: bookingSchemaType = bookingSchema.parse(req.body);
@@ -68,7 +72,7 @@ export const createBookingsController = async (req: Request, res: Response) => {
         status: booking.status,
         bookingDate: booking.booking_date,
       },
-      error: null
+      error: null,
     });
   } catch (error: any) {
     if (error?.name === "ZodError") {
@@ -87,14 +91,20 @@ export const createBookingsController = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllBookingsController = async (req: Request<Params>, res: Response) => {
+export const getAllBookingsController = async (
+  req: Request<Params>,
+  res: Response,
+) => {
   try {
     const userId = req.userId;
-    let { status } = req.query
-    
-    const UserBookings = await getAllBookingsFromCurrentUser(userId,String(status))
+    let { status } = req.query;
 
-    const data = UserBookings.map(d => ({
+    const UserBookings = await getAllBookingsFromCurrentUser(
+      userId,
+      String(status),
+    );
+
+    const data = UserBookings.map((d) => ({
       id: d.id,
       roomId: d.room_id,
       hotelId: d.hotel_id,
@@ -106,21 +116,83 @@ export const getAllBookingsController = async (req: Request<Params>, res: Respon
       guests: d.guests,
       totalPrice: Number(d.total_price),
       status: d.status,
-      bookingDate: d.booking_date
-    }))
+      bookingDate: d.booking_date,
+    }));
 
     res.status(200).json({
       success: true,
       data: data,
-      error: null
-    })
+      error: null,
+    });
   } catch (error) {
-
     res.status(400).json({
       success: true,
       data: null,
-      error: "ERROR"
-    })
+      error: "ERROR",
+    });
+  }
+};
 
+export const modifiedBookingController = async (
+  req: Request<BookingIdParams>,
+  res: Response,
+) => {
+  const userId = req.userId;
+  const { bookingId } = req.params;
+  console.log("req.params:", req.params);
+  console.log("req.query:", req.query);
+  console.log("req.originalUrl:", req.originalUrl);
+
+  console.log(bookingId);
+  if (typeof bookingId !== "string") {
+    return res.status(400).json({
+      success: false,
+      error: "INVALID_BOOKING_ID",
+    });
+  }
+  try {
+    console.log("1 reached");
+    console.log(bookingId);
+    const modifiedBooking = await modifyBooking(bookingId, userId);
+    console.log("2 reached");
+    res.status(200).json({
+      success: true,
+      data: {
+        id: modifiedBooking.id,
+        status: modifiedBooking.status,
+        cancelledAt: modifiedBooking.cancelled_date,
+      },
+      error: null,
+    });
+  } catch (error: any) {
+    if (error?.message === "BOOKING_NOT_FOUND") {
+      return res.status(404).json({
+        success: false,
+        data: null,
+        error: "BOOKING_NOT_CANCELLED",
+      });
+    }
+
+    if (error?.message === "ALREADY_CANCELLED") {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: "ALREADY_CANCELLED",
+      });
+    }
+
+    if (error?.message === "CANCELLATION_DEADLINE_PASSED") {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: "CANCELLATION_DEADLINE_PASSED",
+      });
+    }
+
+    res.status(400).json({
+      success: false,
+      data: null,
+      error: "ERROR",
+    });
   }
 };
