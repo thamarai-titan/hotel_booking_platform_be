@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../db/prisma";
 import type { bookingSchemaType } from "../schemas/bookings.schema";
 
@@ -16,29 +17,76 @@ export const getHotelDetailsWithroomId = async (roomId: string) => {
     }
 }
 
-export const createBookings = async (data: bookingSchemaType, total_price: number, userId:  string, hotel_id: string) => {
-    const {
-        roomId,
-        checkInDate,
-        checkOutDate,
-        guests
-    } = data 
+export const createBookings = async (
+  data: bookingSchemaType,
+  total_price: number,
+  userId: string,
+  hotel_id: string
+) => {
+  const { roomId, checkInDate, checkOutDate, guests } = data
 
+  try {
+    console.log({roomId,hotel_id,userId})
+
+    const booking = await prisma.bookings.create({
+      data: {
+        room_id: roomId,
+        hotel_id,
+        user_id: userId,
+        total_price,
+        check_in_date: new Date(checkInDate),
+        check_out_date: new Date(checkOutDate),
+        guests
+      }
+    })
+
+    console.log("booking created:", booking)
+    return booking
+  } catch (error) {
+    console.error("Create booking error:", error)
+    throw error
+  }
+}
+
+
+export const getAllBookingsFromCurrentUser = async (user_id: string, status: string)=>{
     try {
-        const booking = await prisma.bookings.create({
-            data: {
-                room_id: roomId,
-                hotel_id: hotel_id,
-                user_id: userId,
-                total_price: total_price,
-                check_in_date: checkInDate,
-                check_out_date: checkOutDate,
-                guests: guests
+        const hasStatus = (status === 'confirmed' || status === 'cancelled') 
+
+        const where: Prisma.BookingsWhereInput = {}
+
+        if(user_id){
+            where.user_id = user_id
+        }
+
+        if(hasStatus){
+            where.status = status
+        }
+        const userBookings = await prisma.bookings.findMany({
+            where,
+            include: {
+                hotels: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                },
+                rooms: {
+                    select: {
+                        id: true,
+                        room_number: true,
+                        room_type: true
+                    }
+                }
+            },
+            orderBy: {
+                booking_date: 'desc'
             }
         })
 
-        return booking
+        return userBookings
+
     } catch (error) {
-        
+        throw error
     }
 }
