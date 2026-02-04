@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../db/prisma";
 import type { bookingSchemaType } from "../schemas/bookings.schema";
+import type { StringLike } from "bun";
 
 export const getHotelDetailsWithroomId = async (roomId: string) => {
     try {
@@ -88,5 +89,51 @@ export const getAllBookingsFromCurrentUser = async (user_id: string, status: str
 
     } catch (error) {
         throw error
+    }
+}
+
+
+export const modifyBooking = async (bookingId:string , userId:string)=> {
+    try {
+        console.log(bookingId)
+        console.log(userId)
+        const booking = await prisma.bookings.findFirst({
+            where: {
+                id: bookingId,
+                user_id: userId
+            }
+        })
+        console.log("1")
+        if(!booking){
+            throw new Error("BOOKING_NOT_FOUND")
+        }
+        console.log("2")
+        if(booking.status === "cancelled"){
+            throw new Error("ALREADY_CANCELLED")
+        }
+        console.log("3")
+        const now = new Date()
+        const checkInDate = new Date(booking.check_in_date)
+
+        const diffInHours = (checkInDate.getTime() - now.getTime()) / (1000 * 60 * 60)
+
+        if(diffInHours < 24) {
+            throw new Error("CANCELLATION_DEADLINE_PASSED")
+        }
+        console.log("4")
+        const modifiedBooking = await prisma.bookings.update({
+            where: {
+                id: bookingId
+            },
+            data: {
+                status: "cancelled",
+                cancelled_date: new Date()
+            }
+        })
+        console.log("5")
+        return modifiedBooking
+
+    } catch (error) {
+        throw error 
     }
 }
