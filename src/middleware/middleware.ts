@@ -36,8 +36,19 @@ export const verifyUser = async (req:Request, res:Response, next: NextFunction)=
     }
 }   
 
-export const requireRole = (req:Request, res:Response, next:NextFunction)=>{
+export const requireOwner = (req:Request, res:Response, next:NextFunction)=>{
     if(req.role !== "owner"){
+        return res.status(403).json({
+            success:false,
+            data: null,
+            error: "FORBIDDEN"
+        })
+    }
+    next()
+}
+
+export const requireCustomer = (req:Request, res:Response, next:NextFunction)=>{
+    if(req.role !== "customer"){
         return res.status(403).json({
             success:false,
             data: null,
