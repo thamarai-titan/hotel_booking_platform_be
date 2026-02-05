@@ -26,7 +26,41 @@ export const createBookings = async (
   const { roomId, checkInDate, checkOutDate, guests } = data;
 
   try {
-    console.log({ roomId, hotel_id, userId });
+    const existingBooking = await prisma.bookings.findFirst({
+      where: {
+        room_id: roomId,
+        status: {
+          in: ["confirmed"],
+        },
+        AND: [
+          {
+            check_in_date: {
+              lt: checkOutDate,
+            },
+          },
+          {
+            check_out_date: {
+              gt: checkInDate,
+            },
+          },
+        ],
+      },
+    });
+
+    if (existingBooking) {
+      const existingCheckIn = new Date(existingBooking.check_in_date);
+      const existingCheckOut = new Date(existingBooking.check_out_date);
+
+      const newCheckIn = new Date(checkInDate);
+      const newCheckOut = new Date(checkOutDate);
+
+      const hasOverlap =
+        newCheckIn < existingCheckOut && newCheckOut > existingCheckIn;
+
+      if (hasOverlap && existingBooking.status === "confirmed") {
+        throw new Error("ROOM_NOT_AVAILABLE");
+      }
+    }
 
     const booking = await prisma.bookings.create({
       data: {
