@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
   engineType = "client"
 }
 
@@ -22,74 +22,76 @@ enum Status {
   confirmed
   cancelled
 }
-model User { 
-  id String @id @default(uuid())
-  name String 
-  email String @unique
-  password String
-  role Role 
-  phone String
-  createdAt DateTime @default(now())
-  hotels Hotels[]
-  bookings Bookings[]
-  reviews Reviews[]
+
+model User {
+  id        String     @id @default(uuid())
+  name      String
+  email     String     @unique
+  password  String
+  role      Role
+  phone     String
+  createdAt DateTime   @default(now())
+  hotels    Hotels[]
+  bookings  Bookings[]
+  reviews   Reviews[]
 }
 
 model Hotels {
-  id String @id @default(uuid())
-  owner_id String
-  name String 
-  description String
-  city String
-  country String 
-  amenities Json? @default("[]")
-  rating Decimal? @db.Decimal(2,1) @default(0.0)
-  total_reviews Int? @default(0)
-  createdAt DateTime @default(now())
-  user User @relation(fields: [owner_id], references: [id])
-  rooms Rooms[]
-  bookings Bookings[]
-  reviews Reviews[]
+  id            String     @id @default(uuid())
+  owner_id      String
+  name          String
+  description   String
+  city          String
+  country       String
+  amenities     Json?      @default("[]")
+  rating        Decimal?   @default(0.0) @db.Decimal(2, 1)
+  total_reviews Int?       @default(0)
+  createdAt     DateTime   @default(now())
+  user          User       @relation(fields: [owner_id], references: [id])
+  rooms         Rooms[]
+  bookings      Bookings[]
+  reviews       Reviews[]
 }
 
 model Rooms {
-  id String @id @default(uuid())
-  hotel_id String 
-  room_number String @unique
-  room_type String
-  price_per_night Decimal @db.Decimal(10,2)
-  max_occupancy Int
-  createdAt DateTime @default(now())
-  hotels Hotels @relation(fields: [hotel_id], references: [id])
-  bookings Bookings[]
-} 
+  id              String     @id @default(uuid())
+  hotel_id        String
+  room_number     String     @unique
+  room_type       String
+  price_per_night Decimal    @db.Decimal(10, 2)
+  max_occupancy   Int
+  createdAt       DateTime   @default(now())
+  hotels          Hotels     @relation(fields: [hotel_id], references: [id])
+  bookings        Bookings[]
+}
 
 model Bookings {
-  id String @id @default(uuid())
-  user_id String
-  room_id String
-  hotel_id String
-  check_in_date DateTime
+  id             String    @id @default(uuid())
+  user_id        String
+  room_id        String
+  hotel_id       String
+  check_in_date  DateTime
   check_out_date DateTime
-  guests Int
-  total_price Decimal @db.Decimal(10,2)
-  status Status @default(confirmed)
-  booking_date DateTime @default(now())
-  cancelled_date DateTime? 
-  user User @relation(fields: [user_id], references: [id])
-  rooms Rooms @relation(fields: [room_id], references: [id])
-  hotels Hotels @relation(fields: [hotel_id], references: [id])
-  reviews Reviews[]
+  guests         Int
+  total_price    Decimal   @db.Decimal(10, 2)
+  status         Status    @default(confirmed)
+  booking_date   DateTime  @default(now())
+  cancelled_date DateTime?
+  user           User      @relation(fields: [user_id], references: [id])
+  rooms          Rooms     @relation(fields: [room_id], references: [id])
+  hotels         Hotels    @relation(fields: [hotel_id], references: [id])
+  reviews        Reviews[]
 }
 
 model Reviews {
-  id String @id
-  user_id String @unique
-  hotel_id String
-  booking_id String @unique
-  rating Int @unique
-  comment DateTime @default(now())
-  user User @relation(fields: [user_id], references: [id])
-  hotels Hotels @relation(fields: [hotel_id], references: [id])
-  bookings Bookings @relation(fields: [booking_id], references: [id])
+  id         String   @id @default(uuid())
+  user_id    String   @unique
+  hotel_id   String
+  booking_id String   @unique
+  rating     Int
+  comment    String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [user_id], references: [id])
+  hotels     Hotels   @relation(fields: [hotel_id], references: [id])
+  bookings   Bookings @relation(fields: [booking_id], references: [id])
 }
