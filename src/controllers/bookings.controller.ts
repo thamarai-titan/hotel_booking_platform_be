@@ -139,11 +139,7 @@ export const modifiedBookingController = async (
 ) => {
   const userId = req.userId;
   const { bookingId } = req.params;
-  console.log("req.params:", req.params);
-  console.log("req.query:", req.query);
-  console.log("req.originalUrl:", req.originalUrl);
-
-  console.log(bookingId);
+  
   if (typeof bookingId !== "string") {
     return res.status(400).json({
       success: false,
@@ -151,10 +147,9 @@ export const modifiedBookingController = async (
     });
   }
   try {
-    console.log("1 reached");
-    console.log(bookingId);
+    
     const modifiedBooking = await modifyBooking(bookingId, userId);
-    console.log("2 reached");
+    
     res.status(200).json({
       success: true,
       data: {
